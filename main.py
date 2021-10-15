@@ -5,4 +5,4 @@
 #Fazer cada teste, função de busca do teste deve retornar n+1, sendo n o número de colisões. Caso não encontre, retorna o número máximo de colisões.
 #Escrever output em arquivos...
 
-hashFunction = lambda string,M : string % M'
+hashFunction = lambda string,M : string % M
