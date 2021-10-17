@@ -11,27 +11,55 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define M 503 //503, 2503, 5003 e 7507
-
-typedef struct {
-    char key[71]; //Hash table armazena os nomes de uma lista de contatos.
-    struct HT *next;
-} HT;
-
-unsigned long long hash(char* name) {
-    unsigned long long hash = 0;
-    int p = 53; //31 se só lower/upper case, 53 se os dois
-    
-    for (int i = 0; i < strlen(name); i++) {
-        hash = (hash * p + (name[i] - 'A' + 1)) % M;
-    }
-    return hash;
+struct HASHTABLE{
+  char key[71]; //Hash table armazena os nomes de uma lista de contatos.
+  struct HASHTABLE *next;
+};
+typedef struct HASHTABLE HT;
+//Inicializa os valores da tabela hash
+void initHT(HT *hashTable, int m) {
+  for (int i = 0; i<m; i++) {
+    strcpy(hashTable[i].key,"");
+    hashTable[i].next= NULL;
+  }
+}
+//Função hash que corresponde uma string à um inteiro de 0 a m-1.
+unsigned long long hash(char* name, int m) {
+  unsigned long long hash = 0;
+  int p = 53; //31 se só lower/upper case, 53 se os dois
+  
+  for (int i = 0; i < strlen(name); i++) {
+      hash = (hash * p + (name[i] - 'A' + 1)) % m;
+  }
+  return hash;
+}
+//Insere um valor na tabela hash.
+void insertHT(HT *hashTable, int m, char *key) {
+  HT *x = &hashTable[ hash(key,m) ];
+  while (x->next != NULL && (strcmp(key,x->key) != 0)) x = x->next;
+  if (x->next != NULL) return;
+  else if (!strcmp("",x->key)) strcpy(x->key,key);
+  else {
+    x->next = (HT*)malloc(sizeof(HT));
+    strcpy(x->next->key,key);
+  }
+}
+//Procura por um nome na tabela hash.
+int searchHT(HT *hashTable, int m, char *key) {
+  HT *x = &hashTable[ hash(key,m) ];
+  int n;
+  for (n = 0; x != NULL && (strcmp(key,x->key) != 0); x = x->next, n++);
+  return n+1;
 }
 
 int main() {
-    HT hashTable[M];
-    char name[] = "Arthur Brackmann Pires";
+  int m = 503; //503, 2503, 5003 e 7507
+  HT hashTable[m];
+  char name[] = "Arthur Brackmann Pires";
 
-    printf("%llu", hash(name));
+  initHT(hashTable,m);
+  insertHT(hashTable, m, name);
+  printf("Nome:: %s\n", hashTable[ hash(name,m) ].key);
+  printf("Consultas: %d", searchHT(hashTable,m,name));
 }
 
