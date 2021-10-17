@@ -12,6 +12,7 @@
 #include <string.h>
 
 #define M 503 //503, 2503, 5003 e 7507
+#define BUFFER_SIZE 256
 
 typedef struct {
     char key[71]; //Hash table armazena os nomes de uma lista de contatos.
@@ -23,15 +24,43 @@ unsigned long long hash(char* name) {
     int p = 53; //31 se só lower/upper case, 53 se os dois
     
     for (int i = 0; i < strlen(name); i++) {
-        hash = (hash * p + (name[i] - 'A' + 1)) % M;
+        hash = (hash * p + (name[i] - 'A' + 1));
     }
+    hash %= M;
     return hash;
 }
 
-int main() {
-    HT hashTable[M];
-    char name[] = "Arthur Brackmann Pires";
+int getName(char buffer[], FILE* file) {
+    if (file == NULL) return 0;
+    if(!(fgets(buffer, BUFFER_SIZE, file))) return -1;
 
-    printf("%llu", hash(name));
+    // fgets returna <name>\n\0 ->entao isso substitui o \n por \0
+    buffer[strlen(buffer) - 2] = '\0';
+    return 1;
+}
+
+int main(){
+    FILE* names;
+    char buffer[BUFFER_SIZE];
+
+    if(!(names = fopen("nomes_10000.txt", "r"))){
+        printf("Arquivo nao encontrado");
+        return 0;
+    }
+
+    if ( getName(buffer, names)==1){
+        printf("%s\n",buffer);  
+    } 
+
+    if ( getName(buffer, names)==1){
+        printf("%s\n",buffer);  
+    } 
+
+    if ( getName(buffer, names)==1){
+        printf("%s\n",buffer);  
+    } 
+
+    fclose(names);
+    return 0;
 }
 
