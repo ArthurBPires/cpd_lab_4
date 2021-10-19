@@ -11,12 +11,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BUFFER_SIZE 256
+
 typedef struct HASHTABLE HT;
 
 struct HASHTABLE {
     char key[71]; //Hash table armazena os nomes de uma lista de contatos.
     HT *next;
 };
+
+int getName(char buffer[], FILE* file) {
+    if (file == NULL) return 0;
+    if(!(fgets(buffer, BUFFER_SIZE, file))) return -1;
+
+    // fgets returna <name>\n\0 ->entao isso substitui o \n por \0
+    buffer[strlen(buffer) - 2] = '\0';
+    return 1;
+}
+
 
 //Inicializa os valores da tabela hash
 void initHT(HT* hashTable, int m) {
