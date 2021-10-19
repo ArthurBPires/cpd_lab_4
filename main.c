@@ -29,7 +29,6 @@ int getName(char buffer[], FILE* file) {
     return 1;
 }
 
-
 //Inicializa os valores da tabela hash
 void initHT(HT* hashTable, int m) {
   for (int i = 0; i<m; i++) {
@@ -37,6 +36,7 @@ void initHT(HT* hashTable, int m) {
     hashTable[i].next= NULL;
   }
 }
+
 //Função hash que corresponde uma string à um inteiro de 0 a m-1.
 unsigned long long hash(char* name, int m) {
   unsigned long long hash = 0;
@@ -63,16 +63,27 @@ int searchHT(HT *hashTable, int m, char *key) {
   HT *x = &hashTable[ hash(key,m) ];
   int n;
   for (n = 0; x != NULL && (strcmp(key,x->key) != 0); x = x->next, n++);
+  //printf("%s", x->key);
   return n+1;
 }
 
 int main() {
+  char buffer[BUFFER_SIZE];
   int m = 503; //503, 2503, 5003 e 7507
   HT hashTable[m];
-  char name[] = "Arthur Brackmann Pires";
+  initHT(hashTable, m);
 
-  initHT(hashTable,m);
-  insertHT(hashTable, m, name);
-  printf("Nome:: %s\n", hashTable[ hash(name,m) ].key);
-  printf("Consultas: %d", searchHT(hashTable,m,name));
+  FILE* insertFile = fopen("nomes_10000.txt", "r");
+  while(getName(buffer,insertFile) != -1){
+    insertHT(hashTable,m,buffer);
+  }
+  fclose(insertFile);
+
+  FILE* searchFile = fopen("consultas.txt", "r");
+  searchHT(hashTable, m,buffer);
+  while(getName(buffer,searchFile) != -1){
+    searchHT(hashTable,m,buffer);
+  }
+
+  return 0;
 }
