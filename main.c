@@ -14,18 +14,20 @@
 
 typedef struct HASHTABLE HT;
 
+//Hash table armazena os nomes de uma lista de contatos.
 struct HASHTABLE {
-    char key[71]; //Hash table armazena os nomes de uma lista de contatos.
+    char key[71]; 
     HT *next;
 };
 
 int getName(char buffer[], FILE* file) {
-    if (file == NULL) return 0;
-    if(!(fgets(buffer, BUFFER_SIZE, file))) return -1;
+  if (file == NULL) return 0;
+  if(!(fgets(buffer, BUFFER_SIZE, file))) 
+  return -1;
 
-    // fgets returna <name>\n\0 ->entao isso substitui o \n por \0
-    buffer[strlen(buffer) - 2] = '\0';
-    return 1;
+  // fgets returna <name>\n\0 -> entao isso substitui o \n por \0
+  buffer[strlen(buffer) - 1] = '\0';
+  return 1;
 }
 
 //Inicializa os valores da tabela hash
@@ -40,36 +42,41 @@ void initHT(HT* hashTable, int m) {
 unsigned long long hash(char* name, int m) {
   unsigned long long hash = 0;
   int p = 53; //31 se só lower/upper case, 53 se os dois
-  
   for (int i = 0; i < strlen(name); i++) {
-      hash = (hash * p + (name[i] - 'A' + 1)) % m;
+    hash = (hash * p + (name[i] - 'A' + 1))%m;
   }
   return hash;
 }
 //Insere um valor na tabela hash.
 void insertHT(HT *hashTable, int m, char *key) {
-  HT *x = &hashTable[ hash(key,m) ];
-  while (x->next != NULL && (strcmp(key,x->key) != 0)) x = x->next;
-  if (x->next != NULL) return;
-  else if (!strcmp("",x->key)) strcpy(x->key,key);
-  else {
-    x->next = (HT*)malloc(sizeof(HT));
-    strcpy(x->next->key,key);
-    x->next->next = NULL;
+  HT *hashItemPointer = &hashTable[ hash(key,m) ];
+  while (hashItemPointer->next != NULL && (strcmp(key,hashItemPointer->key) != 0)) 
+    hashItemPointer = hashItemPointer->next;
+
+  if (hashItemPointer->next != NULL){ 
+    return;
+  }else if (!strcmp("",hashItemPointer->key)){
+    strcpy(hashItemPointer->key,key);
+  }else{
+    hashItemPointer->next = (HT*)malloc(sizeof(HT));
+    strcpy(hashItemPointer->next->key,key);
+    hashItemPointer->next->next = NULL;
   }
 }
 //Procura por um nome na tabela hash.
 int searchHT(HT *hashTable, int m, char *key) {
-  HT *x = &hashTable[ hash(key,m) ];
-  int n;
-  for (n = 0; x != NULL && (strcmp(key,x->key) != 0); x = x->next, n++);
-  //printf("%s", x->key);
+  HT *hashItemPointer = &hashTable[ hash(key,m) ];
+  int n = 0;
+  while(hashItemPointer != NULL && (strcmp(key,hashItemPointer->key) != 0)){
+    hashItemPointer = hashItemPointer->next; 
+    n++;
+  }
   return n+1;
 }
 
 int main() {
   char buffer[BUFFER_SIZE];
-  int i,median,max,maxAux,m = 503; //503, 2503, 5003 e 7507
+  int i,median,max,maxAux,m = 7507; //503, 2503, 5003 e 7507
   i = median = 0;
   HT hashTable[m];
   initHT(hashTable, m);
