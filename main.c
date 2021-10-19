@@ -43,8 +43,9 @@ unsigned long long hash(char* name, int m) {
   unsigned long long hash = 0;
   int p = 53; //31 se só lower/upper case, 53 se os dois
   for (int i = 0; i < strlen(name); i++) {
-    hash = (hash * p + (name[i] - 'A' + 1))%m;
+    hash = (hash * p + (name[i] - 'A' + 1));
   }
+  hash = hash % m;
   return hash;
 }
 //Insere um valor na tabela hash.
