@@ -56,6 +56,7 @@ void insertHT(HT *hashTable, int m, char *key) {
   else {
     x->next = (HT*)malloc(sizeof(HT));
     strcpy(x->next->key,key);
+    x->next->next = NULL;
   }
 }
 //Procura por um nome na tabela hash.
@@ -69,7 +70,8 @@ int searchHT(HT *hashTable, int m, char *key) {
 
 int main() {
   char buffer[BUFFER_SIZE];
-  int m = 503; //503, 2503, 5003 e 7507
+  int i,median,max,maxAux,m = 503; //503, 2503, 5003 e 7507
+  i = median = 0;
   HT hashTable[m];
   initHT(hashTable, m);
 
@@ -80,10 +82,16 @@ int main() {
   fclose(insertFile);
 
   FILE* searchFile = fopen("consultas.txt", "r");
-  searchHT(hashTable, m,buffer);
-  while(getName(buffer,searchFile) != -1){
-    searchHT(hashTable,m,buffer);
-  }
+  do {
+    maxAux = searchHT(hashTable, m,buffer);
+    median += maxAux;
+    if(max < maxAux) max = maxAux;
+    printf("%s %d\n", buffer, searchHT(hashTable, m,buffer));
+    i++;
+  } while(getName(buffer,searchFile) != -1);
+  fclose(searchFile);
+
+  printf("MEDIA %.2f\nMAXIMO %d\n",(float)median/i,max);
 
   return 0;
 }
