@@ -6,7 +6,6 @@
  * - Fazer cada teste, função de busca do teste deve retornar n+1, sendo n o número de colisões. Caso não encontre, retorna o número máximo de colisões.
  * - Escrever output em arquivos...
  */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -63,7 +62,7 @@ void insertHT(HT *hashTable, int m, char *key) {
 int searchHT(HT *hashTable, int m, char *key) {
   HT *x = &hashTable[ hash(key,m) ];
   int n;
-  for (n = 0; x->next != NULL && (strcmp(key,x->key) != 0); x = x->next, n++);
+  for (n = 0; x != NULL && (strcmp(key,x->key) != 0); x = x->next, n++);
   //printf("%s", x->key);
   return n+1;
 }
@@ -82,13 +81,13 @@ int main() {
   fclose(insertFile);
 
   FILE* searchFile = fopen("consultas.txt", "r");
-  do {
+  while(getName(buffer,searchFile) != -1){
     maxAux = searchHT(hashTable, m,buffer);
     median += maxAux;
     if(max < maxAux) max = maxAux;
     printf("%s %d\n", buffer, searchHT(hashTable, m,buffer));
     i++;
-  } while(getName(buffer,searchFile) != -1);
+  }
   fclose(searchFile);
 
   printf("MEDIA %.2f\nMAXIMO %d\n",(float)median/i,max);
