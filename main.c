@@ -63,7 +63,7 @@ void insertHT(HT *hashTable, int m, char *key) {
 int searchHT(HT *hashTable, int m, char *key) {
   HT *x = &hashTable[ hash(key,m) ];
   int n;
-  for (n = 0; x != NULL && (strcmp(key,x->key) != 0); x = x->next, n++);
+  for (n = 0; x->next != NULL && (strcmp(key,x->key) != 0); x = x->next, n++);
   //printf("%s", x->key);
   return n+1;
 }
