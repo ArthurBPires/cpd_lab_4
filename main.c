@@ -70,7 +70,7 @@ void freeHTCell(HT *hashCell) {
   if(hashCell->next != NULL) freeHTCell(hashCell->next);
   free(hashCell);
 }
-void freeHT(HT *hashTable, int m) {
+void freeHTChains(HT *hashTable, int m) {
   for(int j=0; j<m; j++)
     if(hashTable[j].next != NULL) freeHTCell(hashTable[j].next);
 }
@@ -96,7 +96,7 @@ int fineTune(FILE* insertFile, FILE* searchFile) {
       fseek(insertFile, 0, SEEK_SET);
       fseek(searchFile, 0, SEEK_SET);
 
-      freeHT(hashTable, m[j]);
+      freeHTChains(hashTable, m[j]);
     }
     if(medianMin > (float)median/i) {
       medianMin = (float)median/i;
@@ -109,7 +109,8 @@ int main() {
   char buffer[BUFFER_SIZE];
   int i,p,median,max,maxAux,m = 7507; //503, 2503, 5003 e 7507
   i = median = 0;
-  HT hashTable[m];
+  HT *hashTable;
+  hashTable = malloc(m*sizeof(HT));
   initHT(hashTable, m);
 
   FILE* insertFile = fopen("nomes_10000.txt", "r");
@@ -127,8 +128,8 @@ int main() {
     i++;
   }
   printf("MEDIA %.2f\nMAXIMO %d\n",(float)median/i,max);
-  freeHT(hashTable,m);
-
+  freeHTChains(hashTable,m);
+  free(hashTable);
   fclose(insertFile);
   fclose(searchFile);
 
