@@ -117,7 +117,7 @@ int main() {
 
   FILE* insertFile = fopen("nomes_10000.txt", "r");
   FILE* searchFile = fopen("consultas.txt", "r");
-  p = P //fineTune(insertFile, searchFile);
+  p = P; //fineTune(insertFile, searchFile);
   
   while(getName(buffer,insertFile) != -1)
     insertHT(hashTable,m,p,buffer);
