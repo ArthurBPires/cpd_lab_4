@@ -29,7 +29,7 @@ int getName(char buffer[], FILE* file) {
     if(!(fgets(buffer, BUFFER_SIZE, file))) return -1;
 
     // fgets retorna <name>\n\0 ->entao isso substitui o \n por \0
-    buffer[strlen(buffer) - 2] = '\0';
+    if (buffer[strlen(buffer) - 1] == '\n') buffer[strlen(buffer) - 1] = '\0';
     return 1;
 }
 
@@ -110,30 +110,69 @@ int fineTune(FILE* insertFile, FILE* searchFile) {
 }
 int main() {
   char buffer[BUFFER_SIZE];
-  int i,p,median,max,maxAux,m = 7507; //503, 2503, 5003 e 7507
-  i = median = 0;
+  int i,p,median,max,maxAux,m = 5003; //503, 2503, 5003 e 7507
+  i = median = max = maxAux = 0;
   HT *hashTable;
   hashTable = malloc(m * sizeof(HT));
   initHT(hashTable, m);
 
+  // strings to create the output file name
+  char outputFileName[20] = "experimento";
+  char number[5];
+  char* txt = ".txt";
+
+  // 2 input files and the output file
   FILE* insertFile = fopen("nomes_10000.txt", "r");
   FILE* searchFile = fopen("consultas.txt", "r");
+  FILE* outputFile;
   p = P; //fineTune(insertFile, searchFile);
+
+  // strings and auxiliar strings to write to output File
+  char nameAndSearches[128] = "";   
+  char searches[10] = "";
+  char medianAndMaximum[128] = "";
+  char auxString[128] = "";
   
+  // Creates Output File Name based on m and opens the file
+  snprintf(number, sizeof(number), "%d", m);
+  strcat(outputFileName, number);
+  strcat(outputFileName,txt);
+
+  outputFile = fopen(outputFileName,"w+");
+
+  // insert the names into HASHTABLE
   while(getName(buffer,insertFile) != -1)
     insertHT(hashTable,m,p,buffer);
   
+  // searches for name in HASHTBLE
   while(getName(buffer,searchFile) != -1){
     maxAux = searchHT(hashTable,m,p,buffer);
     median += maxAux;
     if(max < maxAux) max = maxAux;
-    printf("%s %d\n", buffer, maxAux);
     i++;
+
+    // Creates the string "<name> <searches>\n" and writes to file
+    strcpy(nameAndSearches, buffer);
+    snprintf(searches, sizeof(searches), " %d\n", maxAux);
+    strcat(nameAndSearches,searches);
+
+    fwrite(nameAndSearches,1,strlen(nameAndSearches), outputFile);
   }
-  printf("MEDIA %.2f\nMAXIMO %d\n",(float)median/i,max);
+  // creates the string "MEDIA <value>\n MAXIMO <value>\n" and writes to file
+  strcat(medianAndMaximum,"MEDIA");
+  snprintf(auxString, sizeof(auxString), " %.2f\n",(float)median/i );
+  strcat(medianAndMaximum,auxString);
+  strcat(medianAndMaximum,"MAXIMO");
+  snprintf(auxString, sizeof(auxString), " %d\n", max);
+  strcat(medianAndMaximum,auxString);
+  
+  fwrite(medianAndMaximum,1,strlen(medianAndMaximum), outputFile);
+
+  // frees memory and closes files
   freeHT(hashTable,m);
   fclose(insertFile);
   fclose(searchFile);
+  fclose(outputFile);
 
   return 0;
 }
