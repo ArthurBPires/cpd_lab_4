@@ -71,33 +71,34 @@ void freeHTCell(HT *hashCell) {
   if(hashCell->next != NULL) freeHTCell(hashCell->next);
   free(hashCell);
 }
-void freeHTChains(HT *hashTable, int m) {
+void freeHT(HT *hashTable, int m) {
   for(int j=0; j<m; j++)
-    if(hashTable[j].next != NULL) freeHTCell(hashTable[j].next);
+    freeHTCell(&hashTable[j]);
 }
 //Procura pelo valor de p que minimiza a média de conflitos usando de bruteforce.
 int fineTune(FILE* insertFile, FILE* searchFile) {
   char buffer[BUFFER_SIZE];
-  int i,j,median,pBest = 0;
+  int i,j,z,median,pBest = 0;
   float medianMin = INT_MAX;
   int m[4] = {503,2503,5003,7507};
   HT hashTable[7507];
   
-  for(int p=0;p<8000;p++) {//Testei até 20000, possívelmente há estouro de reprsentação no llu na hash.
+  for(int p=0;p<8000;p++) {//Testei até 20000, possívelmente há estouro de representação no llu na hash.
     for (j=0; j<4; j++) {
       initHT(hashTable,m[j]);
       i = median = 0;
-      while(getName(buffer,insertFile) != -1){
+      while(getName(buffer,insertFile) != -1)
         insertHT(hashTable,m[j],p,buffer);
-      }
-      while(getName(buffer,searchFile) != -1){
+      
+      while(getName(buffer,searchFile) != -1) {
         median += searchHT(hashTable,m[j],p,buffer);
         i++;
       }
       fseek(insertFile, 0, SEEK_SET);
       fseek(searchFile, 0, SEEK_SET);
 
-      freeHTChains(hashTable, m[j]);
+      for(int k=0; k<m[j]; k++)
+        if(hashTable[k].next != NULL) freeHTCell(hashTable[k].next);
     }
     if(medianMin > (float)median/i) {
       medianMin = (float)median/i;
@@ -116,7 +117,7 @@ int main() {
 
   FILE* insertFile = fopen("nomes_10000.txt", "r");
   FILE* searchFile = fopen("consultas.txt", "r");
-  p = P; //fineTune(insertFile, searchFile);
+  p = P //fineTune(insertFile, searchFile);
   
   while(getName(buffer,insertFile) != -1)
     insertHT(hashTable,m,p,buffer);
@@ -129,8 +130,7 @@ int main() {
     i++;
   }
   printf("MEDIA %.2f\nMAXIMO %d\n",(float)median/i,max);
-  freeHTChains(hashTable,m);
-  free(hashTable);
+  freeHT(hashTable,m);
   fclose(insertFile);
   fclose(searchFile);
 
