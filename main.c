@@ -14,7 +14,7 @@
 #define BUFFER_SIZE 256
 #define P 1728 
 /** Em geral, usamos o primo 31 se só lower/upper case, 53 se os dois.
- *  fineTuning() determinou 4859 como o melhor número para esses dados.
+ *  fineTuning() determinou 1728 como o melhor número para esses dados.
  */
 
 typedef struct HASHTABLE HT;
@@ -110,7 +110,7 @@ int fineTune(FILE* insertFile, FILE* searchFile) {
 }
 int main() {
   char buffer[BUFFER_SIZE];
-  int i,p,median,max,maxAux,m = 5003; //503, 2503, 5003 e 7507
+  int i,p,median,max,maxAux,m = 7507; //503, 2503, 5003 e 7507
   i = median = max = maxAux = 0;
   HT *hashTable;
   hashTable = malloc(m * sizeof(HT));
