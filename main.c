@@ -12,7 +12,7 @@
 #include <limits.h>
 
 #define BUFFER_SIZE 256
-#define P 4859 
+#define P 1728 
 /** Em geral, usamos o primo 31 se só lower/upper case, 53 se os dois.
  *  fineTuning() determinou 4859 como o melhor número para esses dados.
  */
