@@ -73,7 +73,8 @@ void freeHTCell(HT *hashCell) {
 }
 void freeHT(HT *hashTable, int m) {
   for(int j=0; j<m; j++)
-    freeHTCell(&hashTable[j]);
+    if(hashTable[j].next != NULL) freeHTCell(hashTable[j].next);
+  free(hashTable);
 }
 //Procura pelo valor de p que minimiza a média de conflitos usando de bruteforce.
 int fineTune(FILE* insertFile, FILE* searchFile) {
@@ -112,7 +113,7 @@ int main() {
   int i,p,median,max,maxAux,m = 7507; //503, 2503, 5003 e 7507
   i = median = 0;
   HT *hashTable;
-  hashTable = malloc(m*sizeof(HT));
+  hashTable = malloc(m * sizeof(HT));
   initHT(hashTable, m);
 
   FILE* insertFile = fopen("nomes_10000.txt", "r");
